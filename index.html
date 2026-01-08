@@ -3,217 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Merchant Payment</title>
+    <title>Pay to Business</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             text-align: center;
             padding: 20px;
-            background: #f4f4f4;
-            max-width: 600px;
-            margin: 0 auto;
+            background: #f0f2f5;
+            color: #333;
         }
-        h1 { color: #333; }
         .container {
             background: white;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 500px;
+            margin: 0 auto;
         }
-        input[type="number"], input[type="text"] {
+        h1 { margin-bottom: 5px; color: #1a1a1a; }
+        h3 { margin-top: 30px; color: #444; border-bottom: 2px solid #eee; padding-bottom: 10px;}
+        
+        .merchant-id { background: #e3f2fd; color: #1565c0; padding: 5px 10px; border-radius: 6px; font-family: monospace; font-size: 14px; display: inline-block; margin-bottom: 20px; border: 1px solid #bbdefb;}
+        
+        input {
             width: 100%;
-            max-width: 300px;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            box-sizing: border-box;
+            padding: 14px;
+            margin: 8px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 16px;
+            transition: border-color 0.2s;
         }
+        input:focus { border-color: #2196F3; outline: none; }
+
         .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
         }
         .pay-button {
-            flex: 1;
-            min-width: 200px;
-            padding: 16px;
-            font-size: 18px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             text-decoration: none;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .gpay { background: #4285F4; }
+        .pay-button.full { grid-column: span 2; }
+        
+        .gpay { background: #3C4043; }
         .phonepe { background: #5F2D8F; }
         .paytm { background: #00BAF2; }
-        .general { background: #4CAF50; }
-        .pay-button:hover { opacity: 0.9; }
-        #qr-section { margin: 40px 0; }
-        #qrimg { 
-            width: 300px; 
-            height: 300px; 
-            border: 3px solid #4CAF50; 
-            border-radius: 12px; 
+        .general { background: #2196F3; }
+        .whatsapp { background: #25D366; grid-column: span 2; }
+
+        #qr-container {
+            margin-top: 20px;
+            padding: 15px;
             background: #fff;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            display: inline-block;
         }
+        #qrcode { display: flex; justify-content: center; }
+        #qrcode img { margin: 0 auto; }
+
         .download-btn {
-            background: #2196F3;
+            background: #607d8b;
             color: white;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 20px;
+            font-size: 13px;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
         }
-        .download-btn:hover { background: #1976D2; }
-        .note {
+        
+        .step-badge {
+            background: #333;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        /* INSTRUCTION BOX STYLING */
+        .instruction-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
             font-size: 14px;
-            color: #666;
-            margin-top: 30px;
+            text-align: left;
         }
-        .success {
+        .instruction-box strong { display: block; margin-bottom: 5px; }
+
+        .success-box {
+            display: none;
             background: #e8f5e9;
             color: #2e7d32;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
-            margin: 20px 0;
-            font-size: 16px;
-        }
-        #status { 
-            color: #1976d2; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin: 20px 0; 
+            margin-top: 15px;
+            border: 1px solid #c8e6c9;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>UPI Merchant Payment</h1>
-        <p>Pay to: <strong>BHARATPE.8K0T0X8C8U10501@fbpe</strong></p>
-        <p>Merchant Name: Your Business (via BharatPe)</p>
+        <h1>Payment Portal</h1>
+        <div class="merchant-id">BHARATPE.8K0T0X8C8U10501@fbpe</div>
+        
+        <h3><span class="step-badge">Step 1</span>Make Payment</h3>
+        <p id="status" style="font-size:14px; color:#666;">Enter amount to generate links</p>
 
-        <div class="success">
-            <strong>New: Save/Download QR Code!</strong><br>
-            • Click "Download QR" button below the image to save it to your phone/gallery.<br>
-            • Direct app buttons for Google Pay, PhonePe, Paytm + general chooser.<br>
-            • QR is always reliable (scan with any app).<br>
-            • Host online (free at tiiny.host) for best experience.
-        </div>
-
-        <label for="amount"><strong>Amount (₹) - optional</strong></label><br>
-        <input type="number" id="amount" placeholder="Enter fixed amount (e.g. 500)" min="1" step="0.01"><br>
-
-        <label for="note"><strong>Transaction Note (optional)</strong></label><br>
-        <input type="text" id="note" placeholder="e.g. Payment for order #123"><br>
-
-        <div id="status"></div>
+        <input type="number" id="amount" placeholder="Amount (₹) e.g., 500" min="1" step="0.01">
+        <input type="text" id="note" placeholder="Note (Optional) e.g., Order #123">
 
         <div class="buttons">
-            <a id="gpay-link" class="pay-button gpay">Google Pay</a>
+            <a id="gpay-link" class="pay-button gpay">GPay</a>
             <a id="phonepe-link" class="pay-button phonepe">PhonePe</a>
             <a id="paytm-link" class="pay-button paytm">Paytm</a>
-            <a id="general-link" class="pay-button general">Other UPI Apps</a>
+            <a id="general-link" class="pay-button general full">Other UPI Apps</a>
         </div>
 
         <div id="qr-section">
-            <p><strong>Or scan this QR (Always works!)</strong></p>
-            <img id="qrimg" src="" alt="UPI QR Code">
+            <div id="qr-container">
+                <div id="qrcode"></div>
+            </div>
             <br>
-            <button class="download-btn" onclick="downloadQR()">Download QR Code</button>
-            <p>Open any UPI app → Scan → Pay</p>
+            <button class="download-btn" onclick="downloadQR()">Download QR Image</button>
         </div>
 
-        <p class="note">
-            • QR & buttons update live with amount/note.<br>
-            • Download saves as PNG file (share/print easily).<br>
-            • If button doesn't open app → not installed, use another or QR.<br>
-            • No auto confirmation — check BharatPe app for payments.<br>
-            • Change PAYEE_NAME in code to your exact merchant name.
-        </p>
+        <h3><span class="step-badge">Step 2</span>Send Proof</h3>
+        <p style="font-size:14px; color:#666;">Enter UTR below. You will attach the screenshot in WhatsApp.</p>
+        
+        <input type="number" id="utr-input" placeholder="Enter 12-Digit UTR (e.g. 3344...)" maxlength="12">
+        
+        <div class="instruction-box">
+            <strong>⚠️ IMPORTANT:</strong>
+            1. Click "Open WhatsApp" below.<br>
+            2. The message text will be pre-filled.<br>
+            3. You must <b>manually attach</b> your screenshot in the chat before sending.
+        </div>
+        
+        <div class="buttons">
+            <button onclick="submitViaWhatsApp()" class="pay-button whatsapp">
+                Open WhatsApp & Attach Proof
+            </button>
+        </div>
+        
+        <div id="success-msg" class="success-box">
+            WhatsApp Opened. Please attach image and send!
+        </div>
+
     </div>
 
     <script>
+        // --- CONFIGURATION ---
         const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
-        const PAYEE_NAME = 'Your Business Name'; // ← Change to your exact BharatPe merchant name!
+        const PAYEE_NAME = 'Your Business Name'; 
+        const MERCHANT_PHONE = '919122215237';   
+        // ---------------------
 
-        function getParams() {
+        let qrCodeObj = null;
+
+        function getUPIString() {
             const amountInput = document.getElementById('amount').value.trim();
-            const note = document.getElementById('note').value.trim() || 'Payment';
+            const noteInput = document.getElementById('note').value.trim();
+            
+            let params = new URLSearchParams();
+            params.append('pa', VPA);
+            params.append('pn', PAYEE_NAME);
+            params.append('cu', 'INR');
+            
+            if (noteInput) params.append('tn', noteInput);
+            else params.append('tn', 'Payment');
 
             const amountNum = parseFloat(amountInput);
-            const hasValidAmount = !isNaN(amountNum) && amountNum > 0;
-
-            let params = `pa=\( {VPA}&pn= \){encodeURIComponent(PAYEE_NAME)}&cu=INR&tn=${encodeURIComponent(note)}`;
-
-            if (hasValidAmount) {
-                params += `&am=${amountNum.toFixed(2)}`;
+            if (!isNaN(amountNum) && amountNum > 0) {
+                params.append('am', amountNum.toFixed(2));
+                document.getElementById('status').innerHTML = `Paying <strong>₹${amountNum.toFixed(2)}</strong>`;
+            } else {
+                document.getElementById('status').innerText = "Payer will enter amount in app";
             }
 
-            return '?' + params;
+            return 'upi://pay?' + params.toString();
         }
 
-        function updateLinksAndQR() {
-            const params = getParams();
+        function updateUI() {
+            const upiUrl = getUPIString();
+            document.getElementById('gpay-link').href = upiUrl.replace('upi://', 'gpay://');
+            document.getElementById('phonepe-link').href = upiUrl.replace('upi://', 'phonepe://');
+            document.getElementById('paytm-link').href = upiUrl.replace('upi://', 'paytmmp://');
+            document.getElementById('general-link').href = upiUrl;
 
-            // Google Pay
-            document.getElementById('gpay-link').href = 'gpay://upi/pay' + params;
-
-            // PhonePe
-            document.getElementById('phonepe-link').href = 'phonepe://pay' + params;
-
-            // Paytm
-            document.getElementById('paytm-link').href = 'paytmmp://pay' + params;
-
-            // General UPI (chooser)
-            document.getElementById('general-link').href = 'upi://pay' + params;
-
-            // QR (uses general UPI)
-            const qrUri = 'upi://pay' + params;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrUri)}`;
-            document.getElementById('qrimg').src = qrUrl;
-
-            // Status
-            const amountInput = document.getElementById('amount').value.trim();
-            if (!amountInput) {
-                document.getElementById('status').innerText = 'Variable amount: Payer enters in app';
-            } else {
-                document.getElementById('status').innerText = `Fixed amount: ₹${parseFloat(amountInput).toFixed(2)}`;
-            }
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ""; 
+            qrCodeObj = new QRCode(qrContainer, {
+                text: upiUrl,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
         }
 
         function downloadQR() {
-            const qrImg = document.getElementById('qrimg');
-            if (qrImg.src) {
+            const img = document.querySelector("#qrcode img");
+            if (img && img.src) {
                 const link = document.createElement('a');
-                link.href = qrImg.src;
-                let filename = 'upi-qr';
-                const amount = document.getElementById('amount').value.trim();
-                if (amount) {
-                    filename += `-rs${amount}`;
-                }
-                link.download = filename + '.png';
+                link.href = img.src;
+                const amt = document.getElementById('amount').value;
+                link.download = amt ? `QR_Payment_${amt}.png` : 'QR_Payment.png';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } else {
-                alert('QR code not generated yet — enter details and wait for it to load.');
             }
         }
 
-        // Update on inputs
-        document.getElementById('amount').addEventListener('input', updateLinksAndQR);
-        document.getElementById('note').addEventListener('input', updateLinksAndQR);
+        function submitViaWhatsApp() {
+            const utr = document.getElementById('utr-input').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            const note = document.getElementById('note').value.trim();
+            
+            if (utr.length < 12) {
+                alert("Please enter a valid 12-digit UTR number.");
+                return;
+            }
 
-        // Initial load
-        window.addEventListener('load', updateLinksAndQR);
+            // Create WhatsApp Message Text
+            let msg = `*Payment Verification Request*\n`;
+            msg += `---------------------\n`;
+            msg += `💰 Amount: ₹${amount || 'Variable'}\n`;
+            msg += `🔢 UTR: ${utr}\n`;
+            if(note) msg += `📝 Note: ${note}\n`;
+            msg += `---------------------\n`;
+            msg += `📷 *Screenshot:* (I am attaching it below...)`; // <--- Prompt text
+
+            // Open WhatsApp
+            const waUrl = `https://wa.me/${MERCHANT_PHONE}?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, '_blank');
+
+            document.getElementById('success-msg').style.display = 'block';
+        }
+
+        document.getElementById('amount').addEventListener('input', updateUI);
+        document.getElementById('note').addEventListener('input', updateUI);
+        window.addEventListener('load', updateUI);
     </script>
 </body>
 </html>
