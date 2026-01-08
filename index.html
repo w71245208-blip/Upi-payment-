@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Payment - sourav5698@ybl</title>
+    <title>UPI Payment - Merchant</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,14 +40,14 @@
             margin: 20px 0;
         }
         .pay-button:hover { background: #45a049; }
-        #qr-section { margin: 30px 0; }
+        #qr-section { margin: 40px 0; }
         #qrimg { 
-            width: 250px; 
-            height: 250px; 
-            border: 2px solid #4CAF50; 
+            width: 300px; 
+            height: 300px; 
+            border: 3px solid #4CAF50; 
             border-radius: 12px; 
             background: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
         .note {
             font-size: 14px;
@@ -55,65 +55,65 @@
             margin-top: 30px;
         }
         #status { 
-            color: #d32f2f; 
+            color: #1976d2; 
             font-weight: bold; 
             font-size: 16px;
             margin: 20px 0; 
-            min-height: 40px;
             padding: 10px;
-            background: #ffebee;
+            background: #e3f2fd;
             border-radius: 8px;
             display: none;
         }
-        .warning {
-            background: #e3f2fd;
-            color: #1565c0;
-            padding: 15px;
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
-            font-size: 15px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>UPI Payment</h1>
-        <p>Pay to: <strong>sourav5698@ybl</strong></p>
-        <p>Payee Name: Sourav</p>
+        <h1>UPI Merchant Payment</h1>
+        <p>Pay to: <strong>BHARATPE.8K0T0X8C8U10501@fbpe</strong></p>
+        <p>Merchant Name: Your Business (via BharatPe)</p>
 
-        <div class="warning">
-            <strong>Seamless like real payment gateways!</strong><br>
-            • Click the green button → opens UPI app chooser directly (Google Pay, PhonePe, BHIM, etc.).<br>
-            • If it doesn't open automatically (e.g., viewing locally), a friendly message appears → just scan the QR.<br>
-            • For perfect button experience (no fallback needed), host this page online (free at tiiny.host or GitHub Pages).
+        <div class="success">
+            <strong>Great! This is a Merchant VPA</strong><br>
+            • The "Pay with UPI App" button now works seamlessly — opens app chooser directly (Google Pay, PhonePe, BHIM, etc.) with no security declines.<br>
+            • Perfect for business — just like Razorpay/PhonePe gateways.<br>
+            • Host this page online (free at tiiny.host or GitHub Pages) for the best experience.
         </div>
 
         <label for="amount"><strong>Amount (₹) - optional</strong></label><br>
-        <input type="number" id="amount" placeholder="Enter amount (e.g. 500)" min="1" step="0.01"><br>
+        <input type="number" id="amount" placeholder="Enter fixed amount (e.g. 500)" min="1" step="0.01"><br>
 
         <label for="note"><strong>Transaction Note (optional)</strong></label><br>
-        <input type="text" id="note" placeholder="e.g. Payment for order"><br>
+        <input type="text" id="note" placeholder="e.g. Payment for order #123"><br>
 
         <button class="pay-button" onclick="payWithUPI()">Pay with UPI App →</button>
 
         <div id="status"></div>
 
         <div id="qr-section">
-            <p><strong>Always works: Scan QR with any UPI app</strong><br>(Recommended fallback – works everywhere)</p>
+            <p><strong>Or scan this QR (Always reliable fallback)</strong></p>
             <img id="qrimg" src="" alt="UPI QR Code">
+            <p>Open any UPI app → Scan → Pay</p>
         </div>
 
         <p class="note">
-            • QR updates instantly with your amount/note.<br>
-            • No auto confirmation — check your UPI app manually after payment.<br>
-            • For business/high-volume, get merchant UPI ID from bank.<br>
-            • Button works perfectly when page is hosted online.
+            • QR updates live — leave amount blank for variable payment.<br>
+            • No auto confirmation — check your BharatPe merchant app for payment alerts.<br>
+            • Button works perfectly on Android (hosted online recommended).<br>
+            • Enjoy seamless payments!
         </p>
     </div>
 
     <script>
-        const VPA = 'sourav5698@ybl';
-        const PAYEE_NAME = 'Sourav';
+        const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
+        const PAYEE_NAME = 'Your Business Name'; // Change this to your exact merchant name if needed
 
         function generateURI() {
             const amountInput = document.getElementById('amount').value.trim();
@@ -138,47 +138,30 @@
 
         function updateQR() {
             const uri = generateURI();
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(uri)}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(uri)}`;
             document.getElementById('qrimg').src = qrUrl;
 
             const amountInput = document.getElementById('amount').value.trim();
-            if (!amountInput) {
-                document.getElementById('status').style.display = 'none';
+            const amountNum = parseFloat(amountInput);
+            if (!amountInput || amountNum <= 0) {
+                document.getElementById('status').innerText = 'Variable amount: Payer enters in app';
+            } else {
+                document.getElementById('status').innerText = `Fixed amount set: ₹${amountNum.toFixed(2)}`;
             }
+            document.getElementById('status').style.display = 'block';
         }
 
         function payWithUPI() {
-            updateQR(); // Ensure latest QR
-
+            updateQR();
             const uri = generateURI();
-            const clickedAt = +new Date();
 
-            // Hide any previous status
-            document.getElementById('status').style.display = 'none';
-
-            // Attempt to open UPI intent
+            // Open intent directly (works great with merchant VPA)
             window.location.href = uri;
-
-            // Fallback if intent fails (e.g., local file or no apps)
-            setTimeout(function() {
-                const timeDiff = +new Date() - clickedAt;
-                if (timeDiff < 3000) { // If still on page after ~3 seconds → intent failed
-                    document.getElementById('status').innerHTML = 
-                        '<strong>Could not open UPI app automatically 😔</strong><br>' +
-                        'Please scan the QR code below or open any UPI app manually and pay to sourav5698@ybl';
-                    document.getElementById('status').style.display = 'block';
-                    
-                    // Scroll to QR for convenience
-                    document.getElementById('qr-section').scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 3000);
         }
 
-        // Update QR on input changes
         document.getElementById('amount').addEventListener('input', updateQR);
         document.getElementById('note').addEventListener('input', updateQR);
 
-        // Initial load: Show QR immediately
         window.addEventListener('load', updateQR);
     </script>
 </body>
