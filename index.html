@@ -39,20 +39,14 @@
         .pay-button {
             flex: 1;
             min-width: 200px;
-            padding: 16px 20px;
+            padding: 16px;
             font-size: 18px;
             color: white;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .pay-button img {
-            height: 40px;
+            display: block;
         }
         .gpay { background: #4285F4; }
         .phonepe { background: #5F2D8F; }
@@ -107,10 +101,10 @@
         <p>Merchant Name: Your Business (via BharatPe)</p>
 
         <div class="success">
-            <strong>New: App Logos on Buttons!</strong><br>
-            • Official logos added for Google Pay, PhonePe, Paytm, and UPI.<br>
-            • Buttons open the app directly (if installed).<br>
-            • Download QR feature included.<br>
+            <strong>New: Save/Download QR Code!</strong><br>
+            • Click "Download QR" button below the image to save it to your phone/gallery.<br>
+            • Direct app buttons for Google Pay, PhonePe, Paytm + general chooser.<br>
+            • QR is always reliable (scan with any app).<br>
             • Host online (free at tiiny.host) for best experience.
         </div>
 
@@ -123,22 +117,10 @@
         <div id="status"></div>
 
         <div class="buttons">
-            <a id="gpay-link" class="pay-button gpay">
-                <img src="https://www.logo.wine/a/logo/Google_Pay/Google_Pay-Logo.wine.svg" alt="Google Pay">
-                <span>Google Pay</span>
-            </a>
-            <a id="phonepe-link" class="pay-button phonepe">
-                <img src="https://download.logo.wine/logo/PhonePe/PhonePe-Logo.wine.png" alt="PhonePe">
-                <span>PhonePe</span>
-            </a>
-            <a id="paytm-link" class="pay-button paytm">
-                <img src="https://download.logo.wine/logo/Paytm/Paytm-Logo.wine.png" alt="Paytm">
-                <span>Paytm</span>
-            </a>
-            <a id="general-link" class="pay-button general">
-                <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/upi-icon.svg" alt="UPI">
-                <span>Other UPI Apps</span>
-            </a>
+            <a id="gpay-link" class="pay-button gpay">Google Pay</a>
+            <a id="phonepe-link" class="pay-button phonepe">PhonePe</a>
+            <a id="paytm-link" class="pay-button paytm">Paytm</a>
+            <a id="general-link" class="pay-button general">Other UPI Apps</a>
         </div>
 
         <div id="qr-section">
@@ -150,10 +132,10 @@
         </div>
 
         <p class="note">
-            • Logos & buttons update live with amount/note.<br>
-            • Download saves QR as PNG.<br>
-            • If button doesn't open → app not installed, use another or QR.<br>
-            • No auto confirmation — check BharatPe app.<br>
+            • QR & buttons update live with amount/note.<br>
+            • Download saves as PNG file (share/print easily).<br>
+            • If button doesn't open app → not installed, use another or QR.<br>
+            • No auto confirmation — check BharatPe app for payments.<br>
             • Change PAYEE_NAME in code to your exact merchant name.
         </p>
     </div>
