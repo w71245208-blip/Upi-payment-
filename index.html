@@ -1,34 +1,9 @@
-Here is the updated code. I have replaced the old BharatPe ID with your new Paytm UPI ID: **`paytmqr5flp8v@ptys`**.
-
-### Option 1: Quick Fix (Change only this part)
-
-Scroll down to the `<script>` section at the bottom of your file and change the **`vpa`** line inside the `CONFIG` variable:
-
-```javascript
-// --- CONFIGURATION START ---
-const CONFIG = {
-    vpa: 'paytmqr5flp8v@ptys',       // <--- CHANGED HERE
-    name: 'Your Business Name',
-    merchantPhone: '919122215237' 
-};
-// --- CONFIGURATION END ---
-
-```
-
----
-
-### Option 2: Full Code (Copy & Paste)
-
-Here is the complete file with the new ID already integrated.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Payment Portal</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Pay to Business</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -57,7 +32,6 @@ Here is the complete file with the new ID already integrated.
             padding-bottom: 10px;
         }
 
-        /* Merchant ID Copy Section */
         .merchant-box {
             background: #e3f2fd;
             border: 1px dashed #2196F3;
@@ -122,7 +96,6 @@ Here is the complete file with the new ID already integrated.
         .pay-button:active { opacity: 0.8; }
         .pay-button.full { grid-column: span 2; }
         
-        /* App Colors */
         .gpay { background: #ea4335; }
         .phonepe { background: #5F2D8F; }
         .paytm { background: #00BAF2; }
@@ -136,8 +109,13 @@ Here is the complete file with the new ID already integrated.
             border: 2px dashed #ddd;
             border-radius: 12px;
             display: inline-block;
+            min-height: 200px; /* Reserves space */
         }
-        #qrcode img { margin: 0 auto; display: block; }
+        #qr-image {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
 
         .download-btn {
             background: transparent;
@@ -157,7 +135,6 @@ Here is the complete file with the new ID already integrated.
             font-size: 11px;
             margin-right: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .instruction-box {
@@ -210,10 +187,10 @@ Here is the complete file with the new ID already integrated.
 
         <div id="qr-section">
             <div id="qr-container">
-                <div id="qrcode"></div>
+                <img id="qr-image" src="" alt="Generating QR..." />
             </div>
             <br>
-            <button class="download-btn" onclick="downloadQR()">Save QR Code</button>
+            <button class="download-btn" onclick="downloadQR()">Save QR Image</button>
         </div>
 
         <h3><span class="step-badge">Step 2</span>Verify Payment</h3>
@@ -242,7 +219,7 @@ Here is the complete file with the new ID already integrated.
     <script>
         // --- CONFIGURATION START ---
         const CONFIG = {
-            vpa: 'paytmqr5flp8v@ptys',           // <--- UPDATED UPI ID
+            vpa: 'paytmqr5flp8v@ptys',           // Your Paytm ID
             name: 'Your Business Name',
             merchantPhone: '919122215237' 
         };
@@ -250,8 +227,6 @@ Here is the complete file with the new ID already integrated.
 
         // Set VPA in UI
         document.getElementById('display-vpa').innerText = CONFIG.vpa;
-
-        let qrCodeObj = null;
 
         function getUPIString() {
             const amountInput = document.getElementById('amount').value.trim();
@@ -264,7 +239,6 @@ Here is the complete file with the new ID already integrated.
             
             if (noteInput) params.append('tn', noteInput);
             
-            // Note: If no amount is entered, we generate a static QR
             const amountNum = parseFloat(amountInput);
             if (!isNaN(amountNum) && amountNum > 0) {
                 params.append('am', amountNum.toFixed(2));
@@ -279,24 +253,16 @@ Here is the complete file with the new ID already integrated.
         function updateUI() {
             const upiUrl = getUPIString();
             
-            // Update Buttons with Deep Links
+            // 1. Update Buttons
             document.getElementById('gpay-link').href = upiUrl.replace('upi://', 'gpay://');
             document.getElementById('phonepe-link').href = upiUrl.replace('upi://', 'phonepe://');
             document.getElementById('paytm-link').href = upiUrl.replace('upi://', 'paytmmp://');
             document.getElementById('general-link').href = upiUrl;
 
-            // Update QR Code
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = ""; // Clear previous QR
-            
-            qrCodeObj = new QRCode(qrContainer, {
-                text: upiUrl,
-                width: 180,
-                height: 180,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.M
-            });
+            // 2. Update QR Image (Using API instead of Script)
+            // We encode the UPI URL to safely pass it to the QR generator
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+            document.getElementById('qr-image').src = qrApiUrl;
         }
 
         function copyVPA() {
@@ -313,15 +279,11 @@ Here is the complete file with the new ID already integrated.
         }
 
         function downloadQR() {
-            const img = document.querySelector("#qrcode img");
+            const img = document.getElementById("qr-image");
             if (img && img.src) {
-                const link = document.createElement('a');
-                link.href = img.src;
-                const amt = document.getElementById('amount').value;
-                link.download = amt ? `Payment_QR_${amt}.png` : 'Payment_QR.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // To download an image from a different domain (the API), we open it in a new tab
+                // because browser security often prevents direct download of cross-origin images via JS.
+                window.open(img.src, '_blank');
             }
         }
 
@@ -335,7 +297,6 @@ Here is the complete file with the new ID already integrated.
                 return;
             }
 
-            // Create WhatsApp Message Text
             let msg = `*New Payment Verification* \n`;
             msg += `---------------------\n`;
             msg += `💸 *Amount:* ₹${amount || 'Custom Input'}\n`;
@@ -344,7 +305,6 @@ Here is the complete file with the new ID already integrated.
             msg += `---------------------\n`;
             msg += `✅ *Screenshot Attached Below:*`;
 
-            // Open WhatsApp
             const waUrl = `https://wa.me/${CONFIG.merchantPhone}?text=${encodeURIComponent(msg)}`;
             window.open(waUrl, '_blank');
 
@@ -360,5 +320,3 @@ Here is the complete file with the new ID already integrated.
     </script>
 </body>
 </html>
-
-```
