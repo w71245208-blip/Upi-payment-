@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Payment - sourrav5698@ibl</title>
+    <title>UPI Payment - sourav5698@ybl</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,14 +78,14 @@
 <body>
     <div class="container">
         <h1>UPI Payment</h1>
-        <p>Pay to: <strong>sourrav5698@ibl</strong></p>
-        <p>Payee Name: Sourrav</p>
+        <p>Pay to: <strong>sourav5698@ybl</strong></p>
+        <p>Payee Name: Sourav</p>
 
         <div class="warning">
             <strong>Seamless like real payment gateways!</strong><br>
             • Click the green button → opens UPI app chooser directly (Google Pay, PhonePe, BHIM, etc.).<br>
             • If it doesn't open automatically (e.g., viewing locally), a friendly message appears → just scan the QR.<br>
-            • For perfect button experience (no fallback needed), host this page online (free at tiiny.host).
+            • For perfect button experience (no fallback needed), host this page online (free at tiiny.host or GitHub Pages).
         </div>
 
         <label for="amount"><strong>Amount (₹) - optional</strong></label><br>
@@ -112,8 +112,8 @@
     </div>
 
     <script>
-        const VPA = 'sourrav5698@ibl';
-        const PAYEE_NAME = 'Sourrav';
+        const VPA = 'sourav5698@ybl';
+        const PAYEE_NAME = 'Sourav';
 
         function generateURI() {
             const amountInput = document.getElementById('amount').value.trim();
@@ -165,7 +165,7 @@
                 if (timeDiff < 3000) { // If still on page after ~3 seconds → intent failed
                     document.getElementById('status').innerHTML = 
                         '<strong>Could not open UPI app automatically 😔</strong><br>' +
-                        'Please scan the QR code below or open any UPI app manually and pay to sourrav5698@ibl';
+                        'Please scan the QR code below or open any UPI app manually and pay to sourav5698@ybl';
                     document.getElementById('status').style.display = 'block';
                     
                     // Scroll to QR for convenience
