@@ -1,168 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Payment - Merchant</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background: #f4f4f4;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 { color: #333; }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        input[type="number"], input[type="text"] {
-            width: 100%;
-            max-width: 300px;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .pay-button {
-            background: #4CAF50;
-            color: white;
-            padding: 16px 32px;
-            font-size: 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-        .pay-button:hover { background: #45a049; }
-        #qr-section { margin: 40px 0; }
-        #qrimg { 
-            width: 300px; 
-            height: 300px; 
-            border: 3px solid #4CAF50; 
-            border-radius: 12px; 
-            background: #fff;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        .note {
-            font-size: 14px;
-            color: #666;
-            margin-top: 30px;
-        }
-        #status { 
-            color: #1976d2; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin: 20px 0; 
-            padding: 10px;
-            background: #e3f2fd;
-            border-radius: 8px;
-            display: none;
-        }
-        .success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>UPI Merchant Payment</h1>
-        <p>Pay to: <strong>BHARATPE.8K0T0X8C8U10501@fbpe</strong></p>
-        <p>Merchant Name: Your Business (via BharatPe)</p>
+<script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
 
-        <div class="success">
-            <strong>Great! This is a Merchant VPA</strong><br>
-            • The "Pay with UPI App" button now works seamlessly — opens app chooser directly (Google Pay, PhonePe, BHIM, etc.) with no security declines.<br>
-            • Perfect for business — just like Razorpay/PhonePe gateways.<br>
-            • Host this page online (free at tiiny.host or GitHub Pages) for the best experience.
-        </div>
+    const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
+    const PAYEE_NAME = 'sourav kumar';
+    const WHATSAPP_NUMBER = '919060808433';
 
-        <label for="amount"><strong>Amount (₹) - optional</strong></label><br>
-        <input type="number" id="amount" placeholder="Enter fixed amount (e.g. 500)" min="1" step="0.01"><br>
+    const PaymentModal = ({ amount, note, baseParams, qrCodeUrl, vpa, onClose }) => {
+        const [isCopied, setIsCopied] = useState(false);
 
-        <label for="note"><strong>Transaction Note (optional)</strong></label><br>
-        <input type="text" id="note" placeholder="e.g. Payment for order #123"><br>
+        const handleCopyVpa = () => {
+            navigator.clipboard.writeText(vpa).then(() => {
+                setIsCopied(true);
+                setTimeout(() => setIsCopied(false), 2000);
+            });
+        };
 
-        <button class="pay-button" onclick="payWithUPI()">Pay with UPI App →</button>
+        // App-specific URIs (these have much higher success rates for BharatPe merchants)
+        const genericUri = `upi://pay?${baseParams.toString()}`;
+        const phonepeUri = `phonepe://pay?${baseParams.toString()}`;
+        const paytmUri = `paytmmp://pay?${baseParams.toString()}`;
+        const bhimUri = `bhim://pay?${baseParams.toString()}`;
 
-        <div id="status"></div>
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center relative">
+                    <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                    
+                    <h2 className="text-xl font-bold text-gray-800">Complete Your Payment</h2>
+                    <p className="text-gray-600 mt-1">Paying <span className="font-bold text-2xl">₹{amount}</span></p>
 
-        <div id="qr-section">
-            <p><strong>Or scan this QR (Always reliable fallback)</strong></p>
-            <img id="qrimg" src="" alt="UPI QR Code">
-            <p>Open any UPI app → Scan → Pay</p>
-        </div>
+                    <img src={qrCodeUrl} alt="UPI QR Code" className="w-60 h-60 mx-auto my-4 border-4 border-green-500 rounded-lg" />
+                    
+                    <p className="text-sm font-semibold text-gray-700">Best: Scan QR (works 100%)</p>
+                    
+                    <div className="text-xs text-left bg-gray-50 p-3 rounded-lg mt-3 space-y-1">
+                       <p><strong>Easiest:</strong></p>
+                       <p>1. Screenshot this screen.</p>
+                       <p>2. Open UPI app → Scan from Gallery.</p>
+                    </div>
+                    
+                    <div className="mt-5 space-y-3">
+                        <p className="text-sm font-semibold text-gray-700">Or try direct app links (if installed):</p>
+                        
+                        <a href={phonepeUri} className="block w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">Open PhonePe →</a>
+                        
+                        <a href={paytmUri} className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">Open Paytm →</a>
+                        
+                        <a href={bhimUri} className="block w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition">Open BHIM →</a>
+                        
+                        <a href={genericUri} className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition">Open Other UPI App →</a>
+                    </div>
 
-        <p class="note">
-            • QR updates live — leave amount blank for variable payment.<br>
-            • No auto confirmation — check your BharatPe merchant app for payment alerts.<br>
-            • Button works perfectly on Android (hosted online recommended).<br>
-            • Enjoy seamless payments!
-        </p>
-    </div>
+                    <div className="flex items-center justify-center gap-2 mt-4">
+                        <p className="text-gray-600 text-sm">UPI ID: <strong className="font-mono">{vpa}</strong></p>
+                        <button onClick={handleCopyVpa} className="p-1 rounded-md hover:bg-gray-200">
+                            {isCopied ? <span className="text-green-500 text-sm font-semibold">Copied!</span> : <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
+                        </button>
+                    </div>
 
-    <script>
-        const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
-        const PAYEE_NAME = 'Your Business Name'; // Change this to your exact merchant name if needed
+                    <p className="text-xs text-gray-500 mt-4">If link fails → use QR scan (most reliable).</p>
+                </div>
+            </div>
+        );
+    };
 
-        function generateURI() {
-            const amountInput = document.getElementById('amount').value.trim();
-            const note = document.getElementById('note').value.trim() || 'Payment';
+    const App = () => {
+        // ... (keep all your existing state/effects)
 
-            const amountNum = parseFloat(amountInput);
-            const hasValidAmount = !isNaN(amountNum) && amountNum > 0;
+        const tr = useMemo(() => `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`, [amount, note]); // Unique ref
 
-            let params = [
-                `pa=${VPA}`,
-                `pn=${encodeURIComponent(PAYEE_NAME)}`,
-                `cu=INR`,
-                `tn=${encodeURIComponent(note)}`
-            ];
+        const baseParams = useMemo(() => {
+            const params = new URLSearchParams({ 
+                pa: VPA, 
+                pn: PAYEE_NAME, 
+                cu: 'INR',
+                tr: tr  // Add unique transaction ref
+            });
+            if (isAmountValid) params.set('am', parseFloat(amount).toFixed(2));
+            params.set('tn', note.trim() || 'Payment');
+            return params;
+        }, [amount, note, isAmountValid, tr]);
 
-            if (hasValidAmount) {
-                params.push(`am=${amountNum.toFixed(2)}`);
-            }
+        const upiUri = `upi://pay?${baseParams.toString()}`; // For backward compatibility
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUri)}`;
 
-            return 'upi://pay?' + params.join('&');
-        }
+        // ... (rest of your handlers unchanged)
 
-        function updateQR() {
-            const uri = generateURI();
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(uri)}`;
-            document.getElementById('qrimg').src = qrUrl;
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+                {showPaymentModal && <PaymentModal amount={parseFloat(amount).toFixed(2)} note={note} baseParams={baseParams} qrCodeUrl={qrCodeUrl} vpa={VPA} onClose={() => setShowPaymentModal(false)} />}
+                {/* ... rest of your JSX unchanged */}
+            </div>
+        );
+    };
 
-            const amountInput = document.getElementById('amount').value.trim();
-            const amountNum = parseFloat(amountInput);
-            if (!amountInput || amountNum <= 0) {
-                document.getElementById('status').innerText = 'Variable amount: Payer enters in app';
-            } else {
-                document.getElementById('status').innerText = `Fixed amount set: ₹${amountNum.toFixed(2)}`;
-            }
-            document.getElementById('status').style.display = 'block';
-        }
-
-        function payWithUPI() {
-            updateQR();
-            const uri = generateURI();
-
-            // Open intent directly (works great with merchant VPA)
-            window.location.href = uri;
-        }
-
-        document.getElementById('amount').addEventListener('input', updateQR);
-        document.getElementById('note').addEventListener('input', updateQR);
-
-        window.addEventListener('load', updateQR);
-    </script>
-</body>
-</html>
+    // ... root render unchanged
+</script>
