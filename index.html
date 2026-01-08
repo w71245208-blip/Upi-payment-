@@ -39,14 +39,20 @@
         .pay-button {
             flex: 1;
             min-width: 200px;
-            padding: 16px;
+            padding: 16px 20px;
             font-size: 18px;
             color: white;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             text-decoration: none;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .pay-button img {
+            height: 40px;
         }
         .gpay { background: #4285F4; }
         .phonepe { background: #5F2D8F; }
@@ -62,6 +68,17 @@
             background: #fff;
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
+        .download-btn {
+            background: #2196F3;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .download-btn:hover { background: #1976D2; }
         .note {
             font-size: 14px;
             color: #666;
@@ -86,16 +103,15 @@
 <body>
     <div class="container">
         <h1>UPI Merchant Payment</h1>
-        <p>Pay to: <strong>BHARATPE.8K0T0X8C8U10501@fbpe</strong></p>
-        <p>Merchant Name: Your Business (via BharatPe)</p>
+        <p>Pay to: <strong>paytmqr5flp8v@ptys</strong></p>
+        <p>Merchant Name: Your Business (via Paytm)</p>
 
         <div class="success">
-            <strong>Direct App Buttons Added!</strong><br>
-            • Click a button to open that specific UPI app directly (if installed).<br>
-            • "Other UPI Apps" opens the system chooser.<br>
-            • QR works everywhere (scan with any app).<br>
-            • Navi not supported for direct redirect — use QR or Other UPI.<br>
-            • Host online (free at tiiny.host) for best button experience.
+            <strong>VPA Updated to Paytm Merchant!</strong><br>
+            • App logos on buttons for Google Pay, PhonePe, Paytm + general UPI chooser.<br>
+            • Download QR feature included.<br>
+            • Paytm button will open Paytm app directly (perfect for this VPA).<br>
+            • Host online (free at tiiny.host) for best experience.
         </div>
 
         <label for="amount"><strong>Amount (₹) - optional</strong></label><br>
@@ -107,29 +123,44 @@
         <div id="status"></div>
 
         <div class="buttons">
-            <a id="gpay-link" class="pay-button gpay">Google Pay</a>
-            <a id="phonepe-link" class="pay-button phonepe">PhonePe</a>
-            <a id="paytm-link" class="pay-button paytm">Paytm</a>
-            <a id="general-link" class="pay-button general">Other UPI Apps</a>
+            <a id="gpay-link" class="pay-button gpay">
+                <img src="https://www.logo.wine/a/logo/Google_Pay/Google_Pay-Logo.wine.svg" alt="Google Pay">
+                <span>Google Pay</span>
+            </a>
+            <a id="phonepe-link" class="pay-button phonepe">
+                <img src="https://download.logo.wine/logo/PhonePe/PhonePe-Logo.wine.png" alt="PhonePe">
+                <span>PhonePe</span>
+            </a>
+            <a id="paytm-link" class="pay-button paytm">
+                <img src="https://download.logo.wine/logo/Paytm/Paytm-Logo.wine.png" alt="Paytm">
+                <span>Paytm</span>
+            </a>
+            <a id="general-link" class="pay-button general">
+                <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/upi-icon.svg" alt="UPI">
+                <span>Other UPI Apps</span>
+            </a>
         </div>
 
         <div id="qr-section">
             <p><strong>Or scan this QR (Always works!)</strong></p>
             <img id="qrimg" src="" alt="UPI QR Code">
+            <br>
+            <button class="download-btn" onclick="downloadQR()">Download QR Code</button>
             <p>Open any UPI app → Scan → Pay</p>
         </div>
 
         <p class="note">
-            • Buttons update live with amount/note.<br>
-            • If a button doesn't open the app → it's not installed, use another or QR.<br>
-            • No auto confirmation — check BharatPe app for payments.<br>
+            • Logos & buttons update live with amount/note.<br>
+            • Download saves QR as PNG.<br>
+            • If button doesn't open → app not installed, use another or QR.<br>
+            • No auto confirmation — check Paytm Business app for payments.<br>
             • Change PAYEE_NAME in code to your exact merchant name.
         </p>
     </div>
 
     <script>
-        const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
-        const PAYEE_NAME = 'Your Business Name'; // ← Change to your exact BharatPe merchant name!
+        const VPA = 'paytmqr5flp8v@ptys';
+        const PAYEE_NAME = 'Your Business Name'; // ← Change to your exact Paytm merchant name!
 
         function getParams() {
             const amountInput = document.getElementById('amount').value.trim();
@@ -173,6 +204,25 @@
                 document.getElementById('status').innerText = 'Variable amount: Payer enters in app';
             } else {
                 document.getElementById('status').innerText = `Fixed amount: ₹${parseFloat(amountInput).toFixed(2)}`;
+            }
+        }
+
+        function downloadQR() {
+            const qrImg = document.getElementById('qrimg');
+            if (qrImg.src) {
+                const link = document.createElement('a');
+                link.href = qrImg.src;
+                let filename = 'upi-qr';
+                const amount = document.getElementById('amount').value.trim();
+                if (amount) {
+                    filename += `-rs${amount}`;
+                }
+                link.download = filename + '.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert('QR code not generated yet — enter details and wait for it to load.');
             }
         }
 
