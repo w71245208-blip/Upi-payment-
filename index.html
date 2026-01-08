@@ -1,100 +1,271 @@
-<script type="text/babel">
-    const { useState, useMemo, useEffect } = React;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React UPI Payment Gateway</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React Libraries -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="root"></div>
 
-    const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
-    const PAYEE_NAME = 'sourav kumar';
-    const WHATSAPP_NUMBER = '919060808433';
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
 
-    const PaymentModal = ({ amount, note, baseParams, qrCodeUrl, vpa, onClose }) => {
-        const [isCopied, setIsCopied] = useState(false);
+        const VPA = 'BHARATPE.8K0T0X8C8U10501@fbpe';
+        const PAYEE_NAME = 'sourav kumar';
+        const WHATSAPP_NUMBER = '919060808433'; // Replace with your merchant WhatsApp number
 
-        const handleCopyVpa = () => {
-            navigator.clipboard.writeText(vpa).then(() => {
-                setIsCopied(true);
-                setTimeout(() => setIsCopied(false), 2000);
-            });
+        const PaymentModal = ({ amount, note, baseParams, qrCodeUrl, vpa, onClose }) => {
+            const [isCopied, setIsCopied] = useState(false);
+
+            const handleCopyVpa = () => {
+                navigator.clipboard.writeText(vpa).then(() => {
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 2000);
+                });
+            };
+
+            // App-specific deep links (these have much higher success rates for BharatPe merchants)
+            const genericUri = `upi://pay?${baseParams.toString()}`;
+            const phonepeUri = `phonepe://pay?${baseParams.toString()}`;
+            const paytmUri = `paytmmp://pay?${baseParams.toString()}`;
+            const bhimUri = `bhim://pay?${baseParams.toString()}`;
+            const gpayUri = `gpay://upi/pay?${baseParams.toString()}`;
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center relative">
+                        <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                        
+                        <h2 className="text-xl font-bold text-gray-800">Complete Your Payment</h2>
+                        <p className="text-gray-600 mt-1">Paying <span className="font-bold text-2xl">₹{amount}</span></p>
+
+                        <img src={qrCodeUrl} alt="UPI QR Code" className="w-60 h-60 mx-auto my-4 border-4 border-green-500 rounded-lg" />
+                        
+                        <p className="text-sm font-semibold text-gray-700 mb-2">Best Method: Scan QR (Works 100%)</p>
+                        
+                        <div className="text-xs text-left bg-gray-50 p-3 rounded-lg mb-4 space-y-1">
+                           <p><strong>Easiest on Mobile:</strong></p>
+                           <p>1. Take a screenshot of this screen.</p>
+                           <p>2. Open your UPI app (GPay, PhonePe, etc.).</p>
+                           <p>3. Use "Scan from Gallery" option.</p>
+                        </div>
+                        
+                        <div className="space-y-3">
+                            <p className="text-sm font-semibold text-gray-700 -mb-2">Or try direct app links (if app is installed):</p>
+                            
+                            <a href={phonepeUri} className="block w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">Open PhonePe →</a>
+                            
+                            <a href={paytmUri} className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">Open Paytm →</a>
+                            
+                            <a href={gpayUri} className="block w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition">Open Google Pay →</a>
+                            
+                            <a href={bhimUri} className="block w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition">Open BHIM →</a>
+                            
+                            <a href={genericUri} className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition">Open Other UPI App →</a>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-2 mt-5">
+                            <p className="text-gray-600 text-sm">UPI ID: <strong className="font-mono">{vpa}</strong></p>
+                            <button onClick={handleCopyVpa} className="p-1 rounded-md hover:bg-gray-200">
+                                {isCopied ? <span className="text-green-500 text-sm font-semibold">Copied!</span> : 
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-gray-500 mt-4">If any link fails → use QR scan (most reliable).</p>
+                    </div>
+                </div>
+            );
         };
 
-        // App-specific URIs (these have much higher success rates for BharatPe merchants)
-        const genericUri = `upi://pay?${baseParams.toString()}`;
-        const phonepeUri = `phonepe://pay?${baseParams.toString()}`;
-        const paytmUri = `paytmmp://pay?${baseParams.toString()}`;
-        const bhimUri = `bhim://pay?${baseParams.toString()}`;
+        const App = () => {
+            const [amount, setAmount] = useState('');
+            const [note, setNote] = useState('');
+            const [utr, setUtr] = useState('');
+            const [isCopied, setIsCopied] = useState(false);
+            const [paymentHistory, setPaymentHistory] = useState([]);
+            const [isMobile, setIsMobile] = useState(false);
+            const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center relative">
-                    <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                    
-                    <h2 className="text-xl font-bold text-gray-800">Complete Your Payment</h2>
-                    <p className="text-gray-600 mt-1">Paying <span className="font-bold text-2xl">₹{amount}</span></p>
+            useEffect(() => {
+                const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                setIsMobile(isMobileDevice);
+                
+                try {
+                    const storedHistory = localStorage.getItem('paymentHistory');
+                    if (storedHistory) setPaymentHistory(JSON.parse(storedHistory));
+                } catch (error) {
+                    console.error("Failed to parse payment history", error);
+                    localStorage.removeItem('paymentHistory');
+                }
+            }, []);
 
-                    <img src={qrCodeUrl} alt="UPI QR Code" className="w-60 h-60 mx-auto my-4 border-4 border-green-500 rounded-lg" />
-                    
-                    <p className="text-sm font-semibold text-gray-700">Best: Scan QR (works 100%)</p>
-                    
-                    <div className="text-xs text-left bg-gray-50 p-3 rounded-lg mt-3 space-y-1">
-                       <p><strong>Easiest:</strong></p>
-                       <p>1. Screenshot this screen.</p>
-                       <p>2. Open UPI app → Scan from Gallery.</p>
+            const isAmountValid = useMemo(() => {
+                const num = parseFloat(amount);
+                return !isNaN(num) && num > 0;
+            }, [amount]);
+
+            const isUtrValid = useMemo(() => utr.trim().length > 0, [utr]);
+
+            // Unique transaction reference to reduce risk flags
+            const tr = useMemo(() => `ORD${Date.now()}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, [amount, note]);
+
+            const baseParams = useMemo(() => {
+                const params = new URLSearchParams({ 
+                    pa: VPA, 
+                    pn: PAYEE_NAME, 
+                    cu: 'INR',
+                    tr: tr  // Unique reference
+                });
+                if (isAmountValid) params.set('am', parseFloat(amount).toFixed(2));
+                params.set('tn', note.trim() || 'Payment');
+                return params;
+            }, [amount, note, isAmountValid, tr]);
+
+            const upiUri = `upi://pay?${baseParams.toString()}`;
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUri)}`;
+
+            const statusMessage = useMemo(() => isAmountValid ? `Fixed amount set: ₹${parseFloat(amount).toFixed(2)}` : 'Please enter a valid amount to proceed', [amount, isAmountValid]);
+            
+            const addPaymentToHistory = () => {
+                if (!isAmountValid) return;
+                const newPayment = { id: new Date().toISOString(), amount: parseFloat(amount).toFixed(2), note: note.trim() || 'Payment', date: new Date().toLocaleString() };
+                const updatedHistory = [newPayment, ...paymentHistory].slice(0, 5);
+                setPaymentHistory(updatedHistory);
+                localStorage.setItem('paymentHistory', JSON.stringify(updatedHistory));
+            };
+
+            const handleInitiatePayment = () => {
+                if (!isAmountValid) return;
+                addPaymentToHistory();
+                if (isMobile) {
+                    setShowPaymentModal(true);
+                }
+            };
+
+            const handleCopyVpa = () => {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(VPA).then(() => {
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 2000);
+                    });
+                }
+            };
+
+            const handleClearHistory = () => {
+                setPaymentHistory([]);
+                localStorage.removeItem('paymentHistory');
+            };
+
+            const handleWhatsAppShare = () => {
+                let message = `Hello! I have completed a payment.\n\n*Payment Details:*\nAmount: ₹${parseFloat(amount).toFixed(2)}\n`;
+                if (note.trim()) message += `Note: ${note.trim()}\n`;
+                message += `UTR/Ref No: ${utr.trim()}\n\nPlease find the transaction screenshot attached for confirmation. Thank you!`;
+                const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+                    {showPaymentModal && <PaymentModal amount={parseFloat(amount).toFixed(2)} note={note} baseParams={baseParams} qrCodeUrl={qrCodeUrl} vpa={VPA} onClose={() => setShowPaymentModal(false)} />}
+                    <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">UPI Merchant Payment</h1>
+                        
+                        <div className="flex items-center justify-center gap-2 mt-2">
+                            <p className="text-gray-600">Pay to: <strong className="font-mono">{VPA}</strong></p>
+                            <button onClick={handleCopyVpa} className="p-1 rounded-md hover:bg-gray-200 transition" title="Copy UPI ID">
+                                {isCopied ? <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
+                            </button>
+                        </div>
+                        <p className="text-gray-600">Merchant: {PAYEE_NAME} (via BharatPe)</p>
+
+                        <div className="bg-green-50 text-green-800 p-4 rounded-lg my-6 text-left text-sm border border-green-200">
+                            <strong className="block mb-1">Reliable Merchant Payments</strong>
+                            <ul className="list-disc list-inside space-y-1">
+                                <li>QR scanning works perfectly (recommended).</li>
+                                <li>Direct app links improved for higher success rate.</li>
+                                <li>Works on all mobile & desktop devices.</li>
+                            </ul>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label htmlFor="amount" className="block text-left font-semibold text-gray-700 mb-1">Amount (₹) <span className="text-red-500">*</span></label>
+                                <input type="number" id="amount" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 500" min="1" step="0.01" className="w-full p-3 border border-gray-300 rounded-md text-base focus:ring-2 focus:ring-green-500" />
+                            </div>
+                            <div>
+                                <label htmlFor="note" className="block text-left font-semibold text-gray-700 mb-1">Transaction Note (optional)</label>
+                                <input type="text" id="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Payment for order #123" className="w-full p-3 border border-gray-300 rounded-md text-base focus:ring-2 focus:ring-green-500" />
+                            </div>
+                        </div>
+
+                        <div className="my-6">
+                            {isMobile ? (
+                                 <button onClick={handleInitiatePayment} disabled={!isAmountValid} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                    Proceed to Pay →
+                                 </button>
+                            ) : (
+                                <div className="text-center p-4 bg-gray-100 rounded-lg border-2 border-dashed">
+                                    <p className="font-semibold text-gray-800">Please use your mobile to scan the QR code below</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="text-blue-800 font-semibold text-base my-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">{statusMessage}</div>
+
+                        <div className="mt-8">
+                            <p className="font-semibold text-gray-700">Scan this QR to Pay</p>
+                            <img src={qrCodeUrl} alt="UPI QR Code" className="w-64 h-64 md:w-72 md:h-72 border-4 border-green-500 rounded-xl bg-white shadow-xl mx-auto mt-2" />
+                            <p className="text-gray-600 mt-2">Open any UPI app → Scan → Pay</p>
+                        </div>
+
+                        {paymentHistory.length > 0 && (
+                            <div className="mt-8 border-t border-gray-200 pt-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-lg font-semibold text-gray-800 text-left">Recent Payments</h2>
+                                    <button onClick={handleClearHistory} className="text-sm text-red-500 hover:text-red-700 font-semibold">Clear History</button>
+                                </div>
+                                <ul className="space-y-3">
+                                    {paymentHistory.map((p) => (
+                                        <li key={p.id} className="bg-gray-50 p-3 rounded-lg text-left text-sm flex justify-between items-start">
+                                            <div><p className="font-bold text-gray-800">₹{p.amount}</p><p className="text-gray-600 break-all">{p.note}</p></div>
+                                            <p className="text-gray-500 text-xs text-right shrink-0 ml-2">{p.date}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                                 <p className="text-xs text-gray-400 mt-3 text-left">*This is a log of payments initiated from this device.</p>
+                            </div>
+                        )}
+
+                        <div className="mt-8 border-t border-gray-200 pt-6 space-y-4">
+                             <div>
+                                <label htmlFor="utr" className="block text-left font-semibold text-gray-700 mb-1">UTR / Transaction ID <span className="text-red-500">*</span></label>
+                                <input type="text" id="utr" value={utr} onChange={(e) => setUtr(e.target.value)} placeholder="Enter 12-digit UTR from your UPI app" className="w-full p-3 border border-gray-300 rounded-md text-base focus:ring-2 focus:ring-indigo-500" />
+                            </div>
+                            <button onClick={handleWhatsAppShare} disabled={!isAmountValid || !isUtrValid} className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 px-4 rounded-lg text-base flex items-center justify-center gap-2.5 transition-colors disabled:bg-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.3 4.8C17.2 2.7 14.7 1.5 12 1.5c-5.5 0-10 4.5-10 10 0 1.8.5 3.5 1.4 5.1L2 22l5.5-1.4c1.5.8 3.2 1.3 4.9 1.3h.1c5.5 0 10-4.5 10-10 .1-2.7-1.1-5.2-3.2-7.2zm-1.6 11.7c-.2.3-.8.7-1.3.8-.4.1-.9.1-1.4-.1-1.3-.4-2.5-1-4.2-2.3-2-1.5-3.3-3.4-3.8-4-.5-.6-.1-1 .3-1.4.3-.3.6-.8.8-1s.3-.4.5-.7c.2-.3.1-.6 0-.8l-1.4-3.4c-.2-.5-.5-.6-.8-.6-.2 0-.5 0-.7 0-.3 0-.7.1-1 .6s-1.3 1.5-1.3 3.5 1.3 5.3 1.5 5.7c.2.4 2.8 4.4 6.8 6 1 .4 1.8.6 2.4.8.8.2 1.5.1 2.1-.2.7-.3 2.1-1.4 2.4-2.7s.3-2.5.2-2.7c-.1-.2-.4-.3-.7-.5z" /></svg>
+                                Send Proof on WhatsApp
+                            </button>
+                            <p className="text-xs text-gray-500 -mt-2">Enter Amount & UTR, then send a screenshot for faster confirmation.</p>
+                        </div>
                     </div>
-                    
-                    <div className="mt-5 space-y-3">
-                        <p className="text-sm font-semibold text-gray-700">Or try direct app links (if installed):</p>
-                        
-                        <a href={phonepeUri} className="block w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">Open PhonePe →</a>
-                        
-                        <a href={paytmUri} className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">Open Paytm →</a>
-                        
-                        <a href={bhimUri} className="block w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition">Open BHIM →</a>
-                        
-                        <a href={genericUri} className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition">Open Other UPI App →</a>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-2 mt-4">
-                        <p className="text-gray-600 text-sm">UPI ID: <strong className="font-mono">{vpa}</strong></p>
-                        <button onClick={handleCopyVpa} className="p-1 rounded-md hover:bg-gray-200">
-                            {isCopied ? <span className="text-green-500 text-sm font-semibold">Copied!</span> : <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
-                        </button>
-                    </div>
-
-                    <p className="text-xs text-gray-500 mt-4">If link fails → use QR scan (most reliable).</p>
                 </div>
-            </div>
-        );
-    };
+            );
+        };
 
-    const App = () => {
-        // ... (keep all your existing state/effects)
-
-        const tr = useMemo(() => `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`, [amount, note]); // Unique ref
-
-        const baseParams = useMemo(() => {
-            const params = new URLSearchParams({ 
-                pa: VPA, 
-                pn: PAYEE_NAME, 
-                cu: 'INR',
-                tr: tr  // Add unique transaction ref
-            });
-            if (isAmountValid) params.set('am', parseFloat(amount).toFixed(2));
-            params.set('tn', note.trim() || 'Payment');
-            return params;
-        }, [amount, note, isAmountValid, tr]);
-
-        const upiUri = `upi://pay?${baseParams.toString()}`; // For backward compatibility
-        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiUri)}`;
-
-        // ... (rest of your handlers unchanged)
-
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                {showPaymentModal && <PaymentModal amount={parseFloat(amount).toFixed(2)} note={note} baseParams={baseParams} qrCodeUrl={qrCodeUrl} vpa={VPA} onClose={() => setShowPaymentModal(false)} />}
-                {/* ... rest of your JSX unchanged */}
-            </div>
-        );
-    };
-
-    // ... root render unchanged
-</script>
+        const rootElement = document.getElementById('root');
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+    </script>
+</body>
+</html>
