@@ -4,15 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UPI QR Payment</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React Libraries -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <!-- Babel for JSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-800 font-sans">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -35,52 +36,45 @@
             const parsedAmount = parseFloat(amount);
 
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-full w-full h-full max-h-full overflow-y-auto p-8 text-center relative">
-                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-y-auto p-6 text-center relative">
+                        <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                         
-                        <h2 className="text-3xl font-bold text-gray-800 mb-6">Pay ₹{amount}</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Pay ₹{amount}</h2>
 
-                        <div className="mb-10">
-                            <p className="text-xl font-bold text-green-700 mb-4">Primary: Exact Amount QR</p>
-                            <img src={fixedQrCodeUrl} alt="Fixed Amount QR" className="w-full max-w-lg mx-auto border-8 border-green-500 rounded-2xl shadow-2xl" />
-                            <p className="text-lg mt-4">Scan with camera → Amount pre-filled</p>
+                        <div className="mb-6">
+                            <p className="text-sm font-bold text-green-700 mb-2">Primary: Exact Amount QR</p>
+                            <img src={fixedQrCodeUrl} alt="Fixed Amount QR" className="w-full max-w-[250px] mx-auto border-4 border-green-500 rounded-xl" />
+                            <p className="text-xs text-gray-500 mt-2">Scan with camera → Amount pre-filled</p>
                         </div>
 
                         {parsedAmount > 2000 && (
-                            <div className="bg-yellow-100 border-2 border-yellow-400 p-6 rounded-xl mb-8 text-left max-w-2xl mx-auto">
-                                <p className="font-bold text-yellow-800 text-lg mb-3">⚠️ For payments above ₹2000:</p>
-                                <ul className="list-disc list-inside space-y-2 text-yellow-700">
-                                    <li>Some apps limit "Scan from Gallery" to ₹2000.</li>
-                                    <li><strong>Recommended:</strong> Scan live with your camera (no limit).</li>
-                                    <li>Or use the manual QR below.</li>
+                            <div className="bg-yellow-50 border border-yellow-300 p-3 rounded-lg mb-4 text-left text-xs">
+                                <p className="font-bold text-yellow-800 mb-1">⚠️ Payments > ₹2000:</p>
+                                <ul className="list-disc list-inside text-yellow-700">
+                                    <li>"Scan from Gallery" may be limited.</li>
+                                    <li><strong>Recommended:</strong> Scan live with another phone.</li>
                                 </ul>
                             </div>
                         )}
 
-                        <div className="mb-10">
-                            <p className="text-xl font-bold text-blue-700 mb-4">Backup: Manual Entry QR (Works for Any Amount)</p>
-                            <img src={staticQrCodeUrl} alt="Static QR" className="w-full max-w-lg mx-auto border-8 border-blue-500 rounded-2xl shadow-2xl" />
-                            <p className="text-lg mt-4">Scan → Enter ₹{amount} manually</p>
+                        <div className="mb-6">
+                            <p className="text-sm font-bold text-blue-700 mb-2">Backup: Manual Entry QR</p>
+                            <img src={staticQrCodeUrl} alt="Static QR" className="w-full max-w-[250px] mx-auto border-4 border-blue-500 rounded-xl" />
+                            <p className="text-xs text-gray-500 mt-2">Scan → Enter ₹{amount} manually</p>
                         </div>
 
-                        <div className="bg-green-50 p-6 rounded-xl max-w-2xl mx-auto">
-                            <p className="font-bold text-lg mb-3">Easy Steps:</p>
-                            <ol className="list-decimal list-inside space-y-3 text-left">
-                                <li>Screenshot this screen (for gallery scan if under ₹2000).</li>
-                                <li>Or scan live with your UPI app camera.</li>
-                                <li>Pay the amount → Done!</li>
-                            </ol>
-                        </div>
-
-                        <div className="mt-8 flex items-center justify-center gap-4">
-                            <p className="text-gray-700 text-lg">UPI ID: <strong className="font-mono text-xl">{vpa}</strong></p>
-                            <button onClick={handleCopyVpa} className="p-3 bg-gray-200 rounded-lg hover:bg-gray-300">
-                                {isCopied ? <span className="text-green-600 font-bold text-lg">Copied!</span> : 
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
-                            </button>
+                        <div className="mt-4 flex flex-col items-center justify-center gap-2">
+                            <p className="text-xs text-gray-500">UPI ID</p>
+                            <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg w-full justify-between">
+                                <span className="font-mono text-sm truncate">{vpa}</span>
+                                <button onClick={handleCopyVpa} className="text-blue-600">
+                                    {isCopied ? <span className="text-green-600 text-xs font-bold">Copied</span> : 
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,14 +121,15 @@
                 return `upi://pay?${params.toString()}`;
             }, [note]);
 
-            const fixedQrCodeUrl = useMemo(() => `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(fixedUpiUri)}`, [fixedUpiUri]);
-            const staticQrCodeUrl = useMemo(() => `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(staticUpiUri)}`, [staticUpiUri]);
+            // Keep high res for quality, CSS controls display size
+            const fixedQrCodeUrl = useMemo(() => `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(fixedUpiUri)}`, [fixedUpiUri]);
+            const staticQrCodeUrl = useMemo(() => `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(staticUpiUri)}`, [staticUpiUri]);
 
-            const statusMessage = useMemo(() => isAmountValid ? `Ready to pay ₹${parseFloat(amount).toFixed(2)}` : 'Enter amount to generate QR codes', [amount, isAmountValid]);
+            const statusMessage = useMemo(() => isAmountValid ? `Pay ₹${parseFloat(amount).toFixed(2)}` : 'Enter amount', [amount, isAmountValid]);
             
             const addPaymentToHistory = () => {
                 if (!isAmountValid) return;
-                const newPayment = { id: new Date().toISOString(), amount: parseFloat(amount).toFixed(2), note: note.trim() || 'Payment', date: new Date().toLocaleString() };
+                const newPayment = { id: new Date().toISOString(), amount: parseFloat(amount).toFixed(2), note: note.trim() || 'Payment', date: new Date().toLocaleDateString() };
                 const updatedHistory = [newPayment, ...paymentHistory].slice(0, 5);
                 setPaymentHistory(updatedHistory);
                 localStorage.setItem('paymentHistory', JSON.stringify(updatedHistory));
@@ -169,86 +164,102 @@
             return (
                 <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
                     {showModal && <FullScreenQRModal amount={parseFloat(amount).toFixed(2)} fixedQrCodeUrl={fixedQrCodeUrl} staticQrCodeUrl={staticQrCodeUrl} vpa={VPA} onClose={() => setShowModal(false)} />}
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full">
-                        <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">UPI QR Payment</h1>
+                    
+                    {/* Main Card Container - Limited width for mobile look */}
+                    <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
+                        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">UPI Payment</h1>
                         
-                        <div className="text-center mb-8">
-                            <p className="text-gray-700 text-xl">Pay to: <strong className="font-mono text-2xl">{VPA}</strong></p>
-                            <button onClick={handleCopyVpa} className="mt-3 text-blue-600 hover:text-blue-800 font-bold text-lg">
-                                {isCopied ? 'Copied!' : 'Copy UPI ID'}
-                            </button>
-                            <p className="text-gray-600 mt-3 text-lg">Merchant: {PAYEE_NAME} (BharatPe)</p>
+                        {/* Header Info */}
+                        <div className="text-center mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <p className="text-gray-500 text-xs uppercase font-semibold mb-1">Paying to</p>
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                                <span className="font-mono text-sm font-bold text-gray-800 break-all">{VPA}</span>
+                                <button onClick={handleCopyVpa} className="text-blue-600 hover:text-blue-800">
+                                    {isCopied ? <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> : 
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
+                                </button>
+                            </div>
+                            <p className="text-xs text-gray-500">{PAYEE_NAME} (BharatPe)</p>
                         </div>
 
-                        <div className="bg-green-50 border-2 border-green-300 p-6 rounded-xl mb-10 text-center">
-                            <p className="font-bold text-xl text-green-800 mb-4">100% QR-Based (No Direct Links)</p>
-                            <ul className="list-disc list-inside space-y-2 text-green-700 text-lg">
-                                <li>No UPI intent buttons → No errors or restrictions</li>
-                                <li>Works for any amount (including >₹2000)</li>
-                                <li>Scan live or from screenshot</li>
-                            </ul>
-                        </div>
-
-                        <div className="space-y-6 mb-10">
+                        {/* Input Section */}
+                        <div className="space-y-4 mb-6">
                             <div>
-                                <label className="block text-left font-bold text-gray-700 text-xl mb-2">Amount (₹) <span className="text-red-500">*</span></label>
-                                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 5000" className="w-full p-5 text-xl border-2 border-gray-300 rounded-xl focus:border-green-500" />
+                                <label className="block text-xs font-bold text-gray-700 mb-1 ml-1">AMOUNT (₹) <span className="text-red-500">*</span></label>
+                                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" className="w-full p-3 text-lg border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors" />
                             </div>
                             <div>
-                                <label className="block text-left font-bold text-gray-700 text-xl mb-2">Note (optional)</label>
-                                <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Order #123" className="w-full p-5 text-xl border-2 border-gray-300 rounded-xl focus:border-green-500" />
+                                <label className="block text-xs font-bold text-gray-700 mb-1 ml-1">NOTE (OPTIONAL)</label>
+                                <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="For..." className="w-full p-3 text-sm border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors" />
                             </div>
                         </div>
 
+                        {/* Mobile Action Button */}
                         {isMobile && (
-                            <button onClick={handleShowQR} disabled={!isAmountValid} className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-6 rounded-xl text-2xl mb-8">
-                                Show Full-Screen QR →
+                            <button onClick={handleShowQR} disabled={!isAmountValid} className="w-full bg-green-600 active:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl text-lg mb-6 shadow-md transition-all transform active:scale-95">
+                                Show Full Screen QR
                             </button>
                         )}
 
-                        <div className="text-center text-blue-700 font-bold text-xl p-5 bg-blue-50 rounded-xl mb-10">{statusMessage}</div>
+                        <div className={`text-center font-medium text-sm p-3 rounded-lg mb-6 ${isAmountValid ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                            {statusMessage}
+                        </div>
 
+                        {/* Desktop/Tablet View (Always visible if not modal) */}
                         {isAmountValid && (
-                            <>
-                                <div className="text-center mb-12">
-                                    <p className="font-bold text-2xl text-gray-800 mb-6">Primary QR: Exact Amount Pre-filled</p>
-                                    <img src={fixedQrCodeUrl} alt="Fixed Amount QR" className="w-full max-w-md mx-auto border-8 border-green-500 rounded-2xl shadow-2xl" />
-                                    <p className="text-xl text-gray-600 mt-6">Scan → Pay instantly</p>
+                            <div className="space-y-6">
+                                <div className="text-center">
+                                    <p className="font-bold text-sm text-gray-800 mb-2">Primary QR (Exact Amount)</p>
+                                    <div className="bg-white p-2 rounded-xl inline-block shadow-sm border border-gray-100">
+                                        <img src={fixedQrCodeUrl} alt="Fixed Amount QR" className="w-48 h-48 object-contain" />
+                                    </div>
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="font-bold text-2xl text-gray-800 mb-6">Backup QR: Manual Entry (Any Amount)</p>
-                                    <img src={staticQrCodeUrl} alt="Static QR" className="w-full max-w-md mx-auto border-8 border-blue-500 rounded-2xl shadow-2xl" />
-                                    <p className="text-xl text-gray-600 mt-6">Scan → Enter amount manually</p>
+                                    <div className="relative">
+                                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                                            <div className="w-full border-t border-gray-200"></div>
+                                        </div>
+                                        <div className="relative flex justify-center">
+                                            <span className="px-2 bg-white text-xs text-gray-500">OR</span>
+                                        </div>
+                                    </div>
+                                    <p className="font-bold text-sm text-gray-800 mt-4 mb-2">Backup QR (Manual)</p>
+                                     <div className="bg-white p-2 rounded-xl inline-block shadow-sm border border-gray-100">
+                                        <img src={staticQrCodeUrl} alt="Static QR" className="w-40 h-40 object-contain opacity-90" />
+                                    </div>
                                 </div>
-                            </>
+                            </div>
                         )}
 
+                        {/* History Section */}
                         {paymentHistory.length > 0 && (
-                            <div className="mt-12 border-t-4 pt-10">
-                                <div className="flex justify-between mb-6">
-                                    <h2 className="text-2xl font-bold">Recent Payments</h2>
-                                    <button onClick={handleClearHistory} className="text-red-600 hover:text-red-800 font-bold text-lg">Clear</button>
+                            <div className="mt-8 pt-6 border-t border-gray-100">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-sm font-bold text-gray-700">Recent</h2>
+                                    <button onClick={handleClearHistory} className="text-xs text-red-500 font-medium">Clear</button>
                                 </div>
-                                <div className="space-y-6">
+                                <div className="space-y-3">
                                     {paymentHistory.map((p) => (
-                                        <div key={p.id} className="bg-gray-50 p-6 rounded-xl flex justify-between items-center">
+                                        <div key={p.id} className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
                                             <div>
-                                                <p className="font-bold text-2xl">₹{p.amount}</p>
-                                                <p className="text-gray-600 text-lg">{p.note}</p>
+                                                <p className="font-bold text-gray-800">₹{p.amount}</p>
+                                                <p className="text-xs text-gray-500 truncate max-w-[150px]">{p.note}</p>
                                             </div>
-                                            <p className="text-gray-500 text-base">{p.date}</p>
+                                            <p className="text-xs text-gray-400">{p.date}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        <div className="mt-12 border-t-4 pt-10">
-                            <label className="block text-left font-bold text-gray-700 text-xl mb-3">UTR / Reference No. <span className="text-red-500">*</span></label>
-                            <input type="text" value={utr} onChange={(e) => setUtr(e.target.value)} placeholder="Enter 12-digit UTR" className="w-full p-5 text-xl border-2 border-gray-300 rounded-xl mb-6" />
-                            <button onClick={handleWhatsAppShare} disabled={!isAmountValid || !isUtrValid} className="w-full bg-[#25D366] hover:bg-[#128C7E] disabled:bg-gray-400 text-white font-bold py-6 rounded-xl flex items-center justify-center gap-5 text-2xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" viewBox="0 0 24 24" fill="currentColor"><path d="M19.3 4.8C17.2 2.7 14.7 1.5 12 1.5c-5.5 0-10 4.5-10 10 0 1.8.5 3.5 1.4 5.1L2 22l5.5-1.4c1.5.8 3.2 1.3 4.9 1.3h.1c5.5 0 10-4.5 10-10 .1-2.7-1.1-5.2-3.2-7.2zm-1.6 11.7c-.2.3-.8.7-1.3.8-.4.1-.9.1-1.4-.1-1.3-.4-2.5-1-4.2-2.3-2-1.5-3.3-3.4-3.8-4-.5-.6-.1-1 .3-1.4.3-.3.6-.8.8-1s.3-.4.5-.7c.2-.3.1-.6 0-.8l-1.4-3.4c-.2-.5-.5-.6-.8-.6-.2 0-.5 0-.7 0-.3 0-.7.1-1 .6s-1.3 1.5-1.3 3.5 1.3 5.3 1.5 5.7c.2.4 2.8 4.4 6.8 6 1 .4 1.8.6 2.4.8.8.2 1.5.1 2.1-.2.7-.3 2.1-1.4 2.4-2.7s.3-2.5.2-2.7c-.1-.2-.4-.3-.7-.5z" /></svg>
+                        {/* UTR Section */}
+                        <div className="mt-8 pt-6 border-t border-gray-100">
+                            <label className="block text-xs font-bold text-gray-700 mb-1 ml-1">CONFIRM PAYMENT</label>
+                            <input type="text" value={utr} onChange={(e) => setUtr(e.target.value)} placeholder="Enter 12-digit UTR" className="w-full p-3 text-sm border-2 border-gray-200 rounded-xl mb-4 focus:border-green-500 focus:outline-none" />
+                            
+                            <button onClick={handleWhatsAppShare} disabled={!isAmountValid || !isUtrValid} className="w-full bg-[#25D366] hover:bg-[#128C7E] disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm shadow-md transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.3 4.8C17.2 2.7 14.7 1.5 12 1.5c-5.5 0-10 4.5-10 10 0 1.8.5 3.5 1.4 5.1L2 22l5.5-1.4c1.5.8 3.2 1.3 4.9 1.3h.1c5.5 0 10-4.5 10-10 .1-2.7-1.1-5.2-3.2-7.2zm-1.6 11.7c-.2.3-.8.7-1.3.8-.4.1-.9.1-1.4-.1-1.3-.4-2.5-1-4.2-2.3-2-1.5-3.3-3.4-3.8-4-.5-.6-.1-1 .3-1.4.3-.3.6-.8.8-1s.3-.4.5-.7c.2-.3.1-.6 0-.8l-1.4-3.4c-.2-.5-.5-.6-.8-.6-.2 0-.5 0-.7 0-.3 0-.7.1-1 .6s-1.3 1.5-1.3 3.5 1.3 5.3 1.5 5.7c.2.4 2.8 4.4 6.8 6 1 .4 1.8.6 2.4.8.8.2 1.5.1 2.1-.2.7-.3 2.1-1.4 2.4-2.7s.3-2.5.2-2.7c-.1-.2-.4-.3-.7-.5z" /></svg>
                                 Send Proof on WhatsApp
                             </button>
                         </div>
