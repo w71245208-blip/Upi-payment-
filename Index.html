@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment - sourrav5698@ibl</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #f4f4f4;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 { color: #333; }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .pay-button {
+            background: #4CAF50;
+            color: white;
+            padding: 16px 32px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .pay-button:hover { background: #45a049; }
+        #qr-section { margin: 30px 0; }
+        #qrimg { 
+            width: 250px; 
+            height: 250px; 
+            border: 2px solid #4CAF50; 
+            border-radius: 12px; 
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 30px;
+        }
+        #status { 
+            color: #d32f2f; 
+            font-weight: bold; 
+            font-size: 16px;
+            margin: 20px 0; 
+            min-height: 40px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 8px;
+            display: none;
+        }
+        .warning {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UPI Payment</h1>
+        <p>Pay to: <strong>sourrav5698@ibl</strong></p>
+        <p>Payee Name: Sourrav</p>
+
+        <div class="warning">
+            <strong>Seamless like real payment gateways!</strong><br>
+            • Click the green button → opens UPI app chooser directly (Google Pay, PhonePe, BHIM, etc.).<br>
+            • If it doesn't open automatically (e.g., viewing locally), a friendly message appears → just scan the QR.<br>
+            • For perfect button experience (no fallback needed), host this page online (free at tiiny.host).
+        </div>
+
+        <label for="amount"><strong>Amount (₹) - optional</strong></label><br>
+        <input type="number" id="amount" placeholder="Enter amount (e.g. 500)" min="1" step="0.01"><br>
+
+        <label for="note"><strong>Transaction Note (optional)</strong></label><br>
+        <input type="text" id="note" placeholder="e.g. Payment for order"><br>
+
+        <button class="pay-button" onclick="payWithUPI()">Pay with UPI App →</button>
+
+        <div id="status"></div>
+
+        <div id="qr-section">
+            <p><strong>Always works: Scan QR with any UPI app</strong><br>(Recommended fallback – works everywhere)</p>
+            <img id="qrimg" src="" alt="UPI QR Code">
+        </div>
+
+        <p class="note">
+            • QR updates instantly with your amount/note.<br>
+            • No auto confirmation — check your UPI app manually after payment.<br>
+            • For business/high-volume, get merchant UPI ID from bank.<br>
+            • Button works perfectly when page is hosted online.
+        </p>
+    </div>
+
+    <script>
+        const VPA = 'sourrav5698@ibl';
+        const PAYEE_NAME = 'Sourrav';
+
+        function generateURI() {
+            const amountInput = document.getElementById('amount').value.trim();
+            const note = document.getElementById('note').value.trim() || 'Payment';
+
+            const amountNum = parseFloat(amountInput);
+            const hasValidAmount = !isNaN(amountNum) && amountNum > 0;
+
+            let params = [
+                `pa=${VPA}`,
+                `pn=${encodeURIComponent(PAYEE_NAME)}`,
+                `cu=INR`,
+                `tn=${encodeURIComponent(note)}`
+            ];
+
+            if (hasValidAmount) {
+                params.push(`am=${amountNum.toFixed(2)}`);
+            }
+
+            return 'upi://pay?' + params.join('&');
+        }
+
+        function updateQR() {
+            const uri = generateURI();
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(uri)}`;
+            document.getElementById('qrimg').src = qrUrl;
+
+            const amountInput = document.getElementById('amount').value.trim();
+            if (!amountInput) {
+                document.getElementById('status').style.display = 'none';
+            }
+        }
+
+        function payWithUPI() {
+            updateQR(); // Ensure latest QR
+
+            const uri = generateURI();
+            const clickedAt = +new Date();
+
+            // Hide any previous status
+            document.getElementById('status').style.display = 'none';
+
+            // Attempt to open UPI intent
+            window.location.href = uri;
+
+            // Fallback if intent fails (e.g., local file or no apps)
+            setTimeout(function() {
+                const timeDiff = +new Date() - clickedAt;
+                if (timeDiff < 3000) { // If still on page after ~3 seconds → intent failed
+                    document.getElementById('status').innerHTML = 
+                        '<strong>Could not open UPI app automatically 😔</strong><br>' +
+                        'Please scan the QR code below or open any UPI app manually and pay to sourrav5698@ibl';
+                    document.getElementById('status').style.display = 'block';
+                    
+                    // Scroll to QR for convenience
+                    document.getElementById('qr-section').scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 3000);
+        }
+
+        // Update QR on input changes
+        document.getElementById('amount').addEventListener('input', updateQR);
+        document.getElementById('note').addEventListener('input', updateQR);
+
+        // Initial load: Show QR immediately
+        window.addEventListener('load', updateQR);
+    </script>
+</body>
+</html>
